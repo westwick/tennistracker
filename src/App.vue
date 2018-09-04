@@ -194,7 +194,7 @@ export default {
     },
 
     deleteItem (item) {
-      console.log(item)
+      this.$firestore.items.doc(item['.key']).delete();
     },
 
     close () {
@@ -208,6 +208,15 @@ export default {
     save () {
       if (this.editedIndex > -1) {
         // Object.assign(this.desserts[this.editedIndex], this.editedItem)
+        this.$firestore.items.doc(this.editedItem['.key']).update({
+          member_name: this.editedItem.member_name,
+          member_id: this.editedItem.member_id,
+          racquet: this.editedItem.racquet,
+          string_type: this.editedItem.string_type,
+          tension: this.editedItem.tension,
+          entered_by: this.editedItem.entered_by,
+          created_at: this.editedItem.created_at
+        });
       } else {
         this.$firestore.items.add(this.editedItem);
       }
