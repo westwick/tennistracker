@@ -134,9 +134,16 @@
                     </v-icon>
                     <v-icon
                       small
+                      class="mr-2"
                       @click="deleteItem(props.item)"
                     >
                       delete
+                    </v-icon>
+                    <v-icon
+                      small
+                      @click="cloneItem(props.item)"
+                    >
+                      filter_none
                     </v-icon>
                   </td>
                 </template>
@@ -201,7 +208,7 @@ export default {
         string_type: '',
         tension: '',
         entered_by: '',
-        created_at: ''
+        created_at: moment().format('YYYY-MM-DD')
       },
       pagination: {
         rowsPerPage: 25
@@ -227,6 +234,14 @@ export default {
     editItem (item) {
       this.editedIndex = this.items.indexOf(item)
       this.editedItem = Object.assign({}, item)
+      this.dialog = true
+    },
+
+    cloneItem (item) {
+      this.editedIndex = -1
+      this.editedItem = Object.assign({}, item)
+      this.editedItem.created_at = moment().format('YYYY-MM-DD')
+      this.editedItem.entered_by = ''
       this.dialog = true
     },
 
