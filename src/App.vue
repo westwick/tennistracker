@@ -200,7 +200,7 @@ export default {
         string_type: '',
         tension: '',
         entered_by: '',
-        created_at: ''
+        created_at: moment().format('YYYY-MM-DD')
       },
       defaultItem: {
         member_name: '',
