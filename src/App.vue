@@ -39,6 +39,13 @@
               <v-toolbar flat color="#CCCCCC">
                 <v-toolbar-title>Recent</v-toolbar-title>
                 <v-spacer></v-spacer>
+                <v-text-field
+                  v-model="search"
+                  append-icon="search"
+                  label="Search"
+                  single-line
+                  hide-details
+                ></v-text-field>
                 <v-dialog v-model="dialog" max-width="500px">
                   <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn>
                   <v-card>
@@ -82,7 +89,7 @@
               <v-data-table
                 :headers="headers"
                 :items="items"
-                hide-actions
+                :search="search"
                 class="elevation-1"
               >
                 <template slot="items" slot-scope="props">
@@ -135,6 +142,7 @@ export default {
       drawer: false,
       items: [],
       dialog: false,
+      search: '',
       headers: [
         {
           text: 'Member Name',
