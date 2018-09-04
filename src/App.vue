@@ -60,7 +60,31 @@
                             <v-text-field v-model="editedItem.member_name" label="Member Name"></v-text-field>
                           </v-flex>
                           <v-flex xs12 sm6 md4>
-                            <v-text-field v-model="editedItem.member_id" label="Member Number"></v-text-field>
+                            <v-menu
+                              ref="menu"
+                              :close-on-content-click="false"
+                              v-model="menu"
+                              :nudge-right="40"
+                              :return-value.sync="date"
+                              lazy
+                              transition="scale-transition"
+                              offset-y
+                              full-width
+                              min-width="290px"
+                            >
+                              <v-text-field
+                                slot="activator"
+                                v-model="editedItem.created_at"
+                                label="Date"
+                                prepend-icon="event"
+                                readonly
+                              ></v-text-field>
+                              <v-date-picker v-model="editedItem.created_at" no-title scrollable>
+                                <v-spacer></v-spacer>
+                                <v-btn flat color="primary" @click="menu = false">Cancel</v-btn>
+                                <v-btn flat color="primary" @click="$refs.menu.save(date)">OK</v-btn>
+                              </v-date-picker>
+                            </v-menu>
                           </v-flex>
                           <v-flex xs12 sm6 md4>
                             <v-text-field v-model="editedItem.racquet" label="Racquet"></v-text-field>
@@ -90,16 +114,16 @@
                 :headers="headers"
                 :items="items"
                 :search="search"
+                :pagination.sync="pagination"
                 class="elevation-1"
               >
                 <template slot="items" slot-scope="props">
                   <td>{{ props.item.member_name }}</td>
-                  <td class="text-xs-right">{{ props.item.member_id }}</td>
                   <td class="text-xs-right">{{ props.item.racquet }}</td>
                   <td class="text-xs-right">{{ props.item.string_type }}</td>
                   <td class="text-xs-right">{{ props.item.tension }}</td>
                   <td class="text-xs-right">{{ props.item.entered_by }}</td>
-                  <td class="text-xs-right">{{ props.item.created_at }}</td>
+                  <td class="text-xs-right">{{ formatDate(props.item.created_at) }}</td>
                   <td class="justify-center layout px-0">
                     <v-icon
                       small
@@ -134,11 +158,16 @@
 
 <script>
 import { db } from './firestore';
+import * as moment from 'moment';
 
 export default {
   name: 'Home',
   data() {
     return {
+      date: null,
+      menu: false,
+      modal: false,
+      menu2: false,
       drawer: false,
       items: [],
       dialog: false,
@@ -150,7 +179,6 @@ export default {
           sortable: true,
           value: 'member_name'
         },
-        { text: 'Member Number', value: 'member_id' },
         { text: 'Racquet', value: 'racquet' },
         { text: 'String Type', value: 'string_type' },
         { text: 'Tension', value: 'tension' },
@@ -161,7 +189,6 @@ export default {
       editedIndex: -1,
       editedItem: {
         member_name: '',
-        member_id: 0,
         racquet: '',
         string_type: '',
         tension: '',
@@ -170,12 +197,14 @@ export default {
       },
       defaultItem: {
         member_name: '',
-        member_id: 0,
         racquet: '',
         string_type: '',
         tension: '',
         entered_by: '',
         created_at: ''
+      },
+      pagination: {
+        rowsPerPage: 25
       }
     }
   },
@@ -218,7 +247,6 @@ export default {
         // Object.assign(this.desserts[this.editedIndex], this.editedItem)
         this.$firestore.items.doc(this.editedItem['.key']).update({
           member_name: this.editedItem.member_name,
-          member_id: this.editedItem.member_id,
           racquet: this.editedItem.racquet,
           string_type: this.editedItem.string_type,
           tension: this.editedItem.tension,
@@ -229,6 +257,10 @@ export default {
         this.$firestore.items.add(this.editedItem);
       }
       this.close()
+    },
+
+    formatDate(createdAt) {
+      return moment(createdAt).format('MMMM Do, YYYY')
     }
   }
 }
